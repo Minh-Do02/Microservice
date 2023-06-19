@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: db
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+  php:
+    container_name: php
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    restart: always
+    depends_on: 
+      - db
+    links: 
+      - db
+    volumes: 
+      - ./php/www:/var/www/html
+  web:
+    container_name: web
+    build:
+      context: ./httpd
+      dockerfile: Dockerfile
+    restart: always
+    ports: 
+      - 8000:8000
+    depends_on: 
+      - php
+      - db
+    links: 
+      - php
+    volumes: 
+      - ./php/www:/var/www/html
+
